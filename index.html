@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANI EARNING Pro</title>
+    <style>
+        :root { --accent: #00f2fe; --glass: rgba(255, 255, 255, 0.1); }
+        body {
+            margin: 0; font-family: 'Poppins', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1614850523296-e8c041de239b?auto=format&fit=crop&q=80&w=1000');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+            padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+        }
+        h2 { color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        input {
+            width: 100%; padding: 12px; margin: 12px 0; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; outline: none; box-sizing: border-box;
+        }
+        .btn {
+            width: 100%; padding: 14px; border-radius: 10px; border: none;
+            background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000;
+            font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase;
+        }
+        #otpSection, #taskArea, #adminPanel { display: none; }
+        .video-box { width: 100%; height: 220px; background: #000; border-radius: 15px; margin: 20px 0; overflow: hidden; border: 2px solid var(--accent); }
+        .timer { font-size: 24px; font-weight: bold; color: #ff4b2b; }
+    </style>
+</head>
+<body>
+
+<div class="glass-card">
+    <div id="loginSide">
+        <h2>Login</h2>
+        <input type="text" id="userInput" placeholder="Mobile Number or Email">
+        <button class="btn" onclick="handleLogin()">Login Now</button>
+    </div>
+
+    <div id="otpSection">
+        <h2>Verify</h2>
+        <button class="btn" style="background:#25d366; color:white;" onclick="getWA()">Get Code (WhatsApp)</button>
+        <input type="number" id="otpIn" placeholder="Enter 4 Digit Code">
+        <button class="btn" onclick="verify()">Verify Account</button>
+    </div>
+
+    <div id="taskArea">
+        <p>User: <span id="uNum" style="color:var(--accent)"></span></p>
+        <div id="vDisp" class="video-box"></div>
+        <div class="timer" id="timer">Wait: 20s</div>
+        <button id="nBtn" class="btn" style="display:none" onclick="loadV()">Next Video</button>
+        <button id="wBtn" class="btn" style="display:none; background:#2ecc71" onclick="withdraw()">Withdraw Cash</button>
+    </div>
+
+    <div id="adminPanel">
+        <h2 style="color:yellow">Admin Settings</h2>
+        <input type="text" id="vLink" placeholder="Paste New YouTube Link">
+        <input type="number" id="oCode" placeholder="New OTP Code for Users">
+        <button class="btn" onclick="save()">Update System</button>
+        <button class="btn" style="background:red; color:white;" onclick="location.reload()">Exit Admin</button>
+    </div>
+</div>
+
+<script>
+    // --- ADMIN CONFIG (Apna Email/Pass yahan set karein) ---
+    const adminEmail = "admin@mail.com"; // Aapka Admin Email
+    const adminPass = "M4N1123";         // Aapka Admin Password
+    let currentV = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // Default Video
+    let currentO = "1234";               // Default User OTP
+    // ------------------------------------------------------
+
+    let count = 0;
+
+    function handleLogin() {
+        let val = document.getElementById('userInput').value;
+        
+        // Agar Admin Email dala jaye
+        if(val === adminEmail) {
+            let p = prompt("Admin Password Daalein:");
+            if(p === adminPass) {
+                document.getElementById('loginSide').style.display='none';
+                document.getElementById('adminPanel').style.display='block';
+            } else { alert("Ghalat Password!"); }
+        } 
+        // Agar User Number dale
+        else if(val.length >= 10) {
+            document.getElementById('loginSide').style.display='none';
+            document.getElementById('otpSection').style.display='block';
+        } else {
+            alert("Sahi Number ya Email likhein!");
+        }
+    }
+
+    function getWA() {
+        let num = document.getElementById('userInput').value;
+        window.location.href = "https://wa.me/60143153573?text=Mera Number "+num+" hai. Code dein.";
+    }
+
+    function verify() {
+        if(document.getElementById('otpIn').value === currentO) {
+            document.getElementById('uNum').innerText = document.getElementById('userInput').value;
+            document.getElementById('otpSection').style.display='none';
+            document.getElementById('taskArea').style.display='block';
+            loadV();
+        } else { alert("Ghalat OTP Code!"); }
+    }
+
+    function loadV() {
+        document.getElementById('nBtn').style.display='none';
+        let id = currentV.split('v=')[1]?.split('&')[0] || currentV.split('/').pop();
+        document.getElementById('vDisp').innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1" frameborder="0" allow="autoplay"></iframe>`;
+        
+        let t = 20;
+        let i = setInterval(() => {
+            t--;
+            document.getElementById('timer').innerText = "Wait: "+t+"s";
+            if(t<=0) {
+                clearInterval(i);
+                document.getElementById('timer').innerText = "Task Done!";
+                count++;
+                if(count >= 5) document.getElementById('wBtn').style.display='block';
+                else document.getElementById('nBtn').style.display='block';
+            }
+        }, 1000);
+    }
+
+    function save() {
+        if(document.getElementById('vLink').value) currentV = document.getElementById('vLink').value;
+        if(document.getElementById('oCode').value) currentO = document.getElementById('oCode').value;
+        alert("System Updated! Nayi video aur OTP set ho gaya.");
+    }
+
+    function withdraw() {
+        window.location.href = "https://wa.me/60143153573?text=Task Done by "+document.getElementById('userInput').value;
+    }
+</script>
+</body>
+</html>
